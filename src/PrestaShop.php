@@ -25,14 +25,14 @@ class PrestaShop
      * @param array $options Custom Guzzle options
      * @param array $headers Custom Guzzle headers
      */
-    public function __construct( $token = null, $options = [], $headers = [] )
+    public function __construct( $token = null, $store_url = null, $options = [], $headers = [] )
     {
-        $this->initRequest( $token, $options, $headers );
+        $this->initRequest( $token, $store_url, $options, $headers );
     }
 
-    private function initRequest( $token, $options = [], $headers = [] )
+    private function initRequest( $token, $store_url, $options = [], $headers = [] )
     {
-        $this->request = new Request( $token, $options, $headers );
+        $this->request = new Request( $token, $store_url, $options, $headers );
     }
 
     public function customers()
