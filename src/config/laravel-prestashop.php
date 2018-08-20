@@ -8,5 +8,6 @@
 
 return [
 
-    'token' => env( 'PRESTASHOP_API_TOKEN' ),
+    'token'     => env( 'PRESTASHOP_API_TOKEN' ),
+    'store_url' => env( 'PRESTASHOP_STORE_URL' ),
 ];
