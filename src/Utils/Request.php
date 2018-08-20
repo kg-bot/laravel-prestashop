@@ -40,7 +40,7 @@ class Request
         ] );
         $options      = array_merge( $options, [
 
-            'auth'     => [ '', $token ],
+            'auth'     => [ $token, '' ],
             'base_uri' => $store_url . '/api/',
             'headers'  => $headers,
         ] );
