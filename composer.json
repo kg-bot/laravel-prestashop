@@ -1,0 +1,28 @@
+{
+  "name": "kg-bot/laravel-prestashop",
+  "description": "Laravel Integration With PrestaShop",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Stefan Ninic",
+      "email": "ninicstefan94@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.1",
+    "laravel/framework": "^5.5",
+    "guzzlehttp/guzzle": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "PrestaShop\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "PrestaShop\\PrestaShopServiceProvider"
+      ]
+    }
+  }
+}
