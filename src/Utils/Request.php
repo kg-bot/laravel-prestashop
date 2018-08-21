@@ -9,11 +9,8 @@
 namespace PrestaShop\Utils;
 
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use PrestaShop\Exceptions\PrestaShopClientException;
-use PrestaShop\Exceptions\PrestaShopRequestException;
+use PrestaShop\Classes\PrestaShopClass;
+use PrestaShop\Classes\PrestaShopWebserviceException;
 
 class Request
 {
@@ -31,35 +28,24 @@ class Request
      */
     public function __construct( $token = null, $store_url = null, $options = [], $headers = [] )
     {
-        $token        = $token ?? config( 'laravel-prestashop.token' );
-        $store_url    = $store_url ?? config( 'laravel-prestashop.store_url' );
-        $headers      = array_merge( $headers, [
+        $token     = $token ?? config( 'laravel-prestashop.token' );
+        $store_url = $store_url ?? config( 'laravel-prestashop.store_url' );
 
-            'Accept'       => 'application/json',
-            'Content-Type' => 'application/json',
-        ] );
-        $options      = array_merge( $options, [
-
-            'auth'     => [ $token, '' ],
-            'base_uri' => $store_url . '/api/',
-            'headers'  => $headers,
-        ] );
-        $this->client = new Client( $options );
+        $this->client = new PrestaShopClass( $store_url, $token, false );
     }
 
     /**
      * @param $callback
      *
      * @return mixed
-     * @throws \Rackbeat\Exceptions\RackbeatClientException
-     * @throws \Rackbeat\Exceptions\RackbeatRequestException
+     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
      */
     public function handleWithExceptions( $callback )
     {
         try {
             return $callback();
 
-        } catch ( ClientException $exception ) {
+        } catch ( PrestaShopWebserviceException $exception ) {
 
             $message = $exception->getMessage();
             $code    = $exception->getCode();
@@ -70,27 +56,14 @@ class Request
                 $code    = $exception->getResponse()->getStatusCode();
             }
 
-            throw new PrestaShopClientException( $message, $code );
-
-        } catch ( ServerException $exception ) {
-
-            $message = $exception->getMessage();
-            $code    = $exception->getCode();
-
-            if ( $exception->hasResponse() ) {
-
-                $message = (string) $exception->getResponse()->getBody();
-                $code    = $exception->getResponse()->getStatusCode();
-            }
-
-            throw new PrestaShopRequestException( $message, $code );
+            throw new PrestaShopWebserviceException( $message, $code );
 
         } catch ( \Exception $exception ) {
 
             $message = $exception->getMessage();
             $code    = $exception->getCode();
 
-            throw new PrestaShopClientException( $message, $code );
+            throw new PrestaShopWebserviceException( $message, $code );
         }
     }
 }

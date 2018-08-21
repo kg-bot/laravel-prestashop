@@ -11,8 +11,8 @@ namespace PrestaShop\Utils;
 
 class Model
 {
-    protected $entity;
     protected $primaryKey;
+    protected $entity;
     protected $modelClass = self::class;
     protected $fillable   = [];
 
@@ -43,7 +43,7 @@ class Model
 
     protected function setAttribute( $attribute, $value )
     {
-        $this->{$attribute} = $value;
+        $this->{$attribute} = ( $value instanceof \SimpleXMLElement ) ? (string) $value : $value;
     }
 
     public function __toString()

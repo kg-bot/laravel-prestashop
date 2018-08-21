@@ -6,10 +6,10 @@
  * Time: 01.30
  */
 
-namespace Rackbeat\Models;
+namespace PrestaShop\Models;
 
 
-use Rackbeat\Utils\Model;
+use PrestaShop\Utils\Model;
 
 class Order extends Model
 {

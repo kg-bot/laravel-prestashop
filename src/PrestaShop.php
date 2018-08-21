@@ -9,6 +9,7 @@
 namespace PrestaShop;
 
 use PrestaShop\Builders\CustomerBuilder;
+use PrestaShop\Builders\OrderBuilder;
 use PrestaShop\Utils\Request;
 
 class PrestaShop
@@ -38,6 +39,11 @@ class PrestaShop
     public function customers()
     {
         return new CustomerBuilder( $this->request );
+    }
+
+    public function orders()
+    {
+        return new OrderBuilder( $this->request );
     }
 
 

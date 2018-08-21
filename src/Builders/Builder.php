@@ -25,17 +25,21 @@ class Builder
     }
 
     /**
-     * @param array $filters
+     * Get list of all entries, including details if you wish
      *
-     * @return \Illuminate\Support\Collection|Model[]
+     * @param array $filters
+     * @param bool  $details
+     *
+     * @return mixed
+     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
      */
-    public function get( $filters = [] )
+    public function get( $filters = [], $details = false )
     {
-        $urlFilters = '?limit=1500';
+        $urlFilters = '';
 
         if ( count( $filters ) > 0 ) {
 
-            $urlFilters .= '&filter=';
+            $urlFilters = '?filter=';
             $i          = 1;
 
             foreach ( $filters as $filter ) {
@@ -52,16 +56,26 @@ class Builder
             }
         }
 
-        return $this->request->handleWithExceptions( function () use ( $urlFilters ) {
+        return $this->request->handleWithExceptions( function () use ( $urlFilters, $details ) {
 
-            $response     = $this->request->client->get( "{$this->entity}{$urlFilters}" );
-            $responseData = json_decode( (string) $response->getBody() );
-            $fetchedItems = collect( $responseData );
-            $items        = collect( [] );
-            $pages        = $responseData->pages;
+            $response = $this->request->client->get( [
+
+                'resource' => $this->entity,
+            ] );
+
+            $response     = $response->children()->children();
+            $fetchedItems = collect( json_decode( str_replace( PHP_EOL, '', json_encode( $response ) ) ) );
+
+            $items = collect( [] );
 
             foreach ( $fetchedItems->first() as $index => $item ) {
 
+                $identifier = ( (array) $item )[ '@attributes' ]->{$this->primaryKey};
+
+                $item = [
+
+                    $this->primaryKey => $identifier,
+                ];
 
                 /** @var Model $model */
                 $model = new $this->model( $this->request, $item );
@@ -70,6 +84,18 @@ class Builder
 
 
             }
+
+            if ( $details ) {
+
+
+                foreach ( $items as $index => $item ) {
+
+                    $item = $this->find( $item->{$this->primaryKey} );
+
+                    $items[ $index ] = $item;
+                }
+            }
+
 
             return $items;
         } );
@@ -145,12 +171,21 @@ class Builder
     {
         return $this->request->handleWithExceptions( function () use ( $id ) {
 
-            $response     = $this->request->client->get( "{$this->entity}/{$id}" );
-            $responseData = collect( json_decode( (string) $response->getBody() ) );
+            $response = $this->request->client->get( [
+
+                'resource'        => $this->detailsEntity,
+                $this->primaryKey => $id,
+            ] );
+
+            $response = $response->children();
+            $response = $str = str_replace( PHP_EOL, '', json_encode( $response ) );
+            //dd( $response->children()->children() );
+            $responseData = collect( json_decode( $response ) );
 
             return new $this->model( $this->request, $responseData->first() );
         } );
     }
+
 
     public function create( $data )
     {

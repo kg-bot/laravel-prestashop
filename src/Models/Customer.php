@@ -14,6 +14,7 @@ use PrestaShop\Utils\Model;
 class Customer extends Model
 {
 
+    protected $primaryKey = 'id';
     protected $entity     = '/customers';
-    protected $primaryKey = 'number';
+
 }

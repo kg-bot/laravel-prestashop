@@ -6,13 +6,15 @@
  * Time: 01.32
  */
 
-namespace Rackbeat\Builders;
+namespace PrestaShop\Builders;
 
 
-use Rackbeat\Models\Order;
+use PrestaShop\Models\Order;
 
 class OrderBuilder extends Builder
 {
-    protected $entity = 'orders';
-    protected $model  = Order::class;
+    protected $entity        = 'orders';
+    protected $model         = Order::class;
+    protected $detailsEntity = 'order_details';
+    protected $primaryKey    = 'id';
 }
