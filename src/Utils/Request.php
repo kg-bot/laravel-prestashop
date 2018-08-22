@@ -31,7 +31,7 @@ class Request
         $token     = $token ?? config( 'laravel-prestashop.token' );
         $store_url = $store_url ?? config( 'laravel-prestashop.store_url' );
 
-        $this->client = new PrestaShopClass( $store_url, $token, false );
+        $this->client = new PrestaShopClass( $store_url, $token, true );
     }
 
     /**
@@ -49,12 +49,6 @@ class Request
 
             $message = $exception->getMessage();
             $code    = $exception->getCode();
-
-            if ( $exception->hasResponse() ) {
-
-                $message = (string) $exception->getResponse()->getBody();
-                $code    = $exception->getResponse()->getStatusCode();
-            }
 
             throw new PrestaShopWebserviceException( $message, $code );
 
