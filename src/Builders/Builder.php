@@ -8,12 +8,19 @@
 
 namespace PrestaShop\Builders;
 
+use PrestaShop\Traits\Filtering;
+use PrestaShop\Traits\Limiting;
+use PrestaShop\Traits\Parser;
 use PrestaShop\Utils\Model;
 use PrestaShop\Utils\Request;
 
 
 class Builder
 {
+    use Filtering,
+        Limiting,
+        Parser;
+
     protected $entity;
     /** @var Model */
     protected $model;
@@ -33,23 +40,17 @@ class Builder
      * @return mixed
      * @throws \PrestaShop\Classes\PrestaShopWebserviceException
      */
-    public function get( array $filters = [], bool $details = false )
+    public function get( array $filters = [], $limit = [], bool $details = false )
     {
-        $optFilters = [];
+        $optFilters = $this->prepareFilters( $filters );
+        $optLimits  = $this->prepareLimit( $limit );
 
-        if ( count( $filters ) ) {
-
-            foreach ( $filters as $filter => $value ) {
-
-                $optFilters[ 'filter[' . $filter . ']' ] = $value;
-            }
-        }
-
-        return $this->request->handleWithExceptions( function () use ( $optFilters, $details ) {
+        return $this->request->handleWithExceptions( function () use ( $optFilters, $details, $optLimits ) {
 
             $opt = [
 
-                'resource' => $this->entity,
+                'resource'      => $this->entity,
+                'output_format' => 'JSON',
             ];
 
             if ( count( $optFilters ) ) {
@@ -57,19 +58,21 @@ class Builder
                 $opt = array_merge( $opt, $optFilters );
             }
 
+            if ( count( $optLimits ) ) {
+
+                $opt = array_merge( $opt, $optLimits );
+            }
+
             $response = $this->request->client->get( $opt );
 
-            $response     = $response->children()->children();
-            $fetchedItems = collect( json_decode( str_replace( PHP_EOL, '', json_encode( $response ) ) ) );
+            $fetchedItems = collect( $response );
 
             $items = collect( [] );
 
             if ( $fetchedItems->count() ) {
                 foreach ( $fetchedItems->first() as $index => $item ) {
 
-                    $identifier = ( isset( ( (array) $item )[ '@attributes' ] ) ) ?
-                        ( (array) $item )[ '@attributes' ]->{$this->primaryKey} :
-                        $item->{$this->primaryKey};
+                    $identifier = $item[ $this->primaryKey ] ?? null;
 
                     if ( $identifier ) {
 
@@ -104,6 +107,14 @@ class Builder
         } );
     }
 
+    /**
+     * Find specific resource based on primary key/identifier
+     *
+     * @param $id
+     *
+     * @return mixed
+     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     */
     public function find( $id )
     {
         return $this->request->handleWithExceptions( function () use ( $id ) {
@@ -111,25 +122,32 @@ class Builder
             $response = $this->request->client->get( [
 
                 'resource'        => $this->detailsEntity,
+                'output_format'   => 'JSON',
                 $this->primaryKey => $id,
             ] );
 
-            $response = $response->children();
-            $response = $str = str_replace( PHP_EOL, '', json_encode( $response ) );
             //dd( $response->children()->children() );
-            $responseData = collect( json_decode( $response ) );
+            $responseData = collect( $response );
 
             return new $this->model( $this->request, $responseData->first() );
         } );
     }
 
+    /**
+     * Create new resource
+     *
+     * @param $data
+     *
+     * @return mixed
+     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     */
     public function create( $data )
     {
         return $this->request->handleWithExceptions( function () use ( $data ) {
 
             $blank = $this->request->client->get( [
 
-                'url' => config( 'laravel-prestashop.store_url' ) . '/api/' . $this->entity . '?schema=blank',
+                'url' => config( 'laravel-prestashop.store_url' ) . '/api/' . $this->entity,
             ] );
 
             if ( !isset( $data[ 'name' ] ) ) {
@@ -153,45 +171,13 @@ class Builder
                 'postXml'  => $xml,
             ] );
 
-            dd( $response );
+            $data = $this->xmlToArray( $response->children()->children() );
 
-            $responseData = collect( json_decode( (string) $response->getBody() ) );
 
-            return new $this->model( $this->request, $responseData->first() );
+            return new $this->model( $this->request, $data );
         } );
     }
 
-    protected function arrayToXml( $dom, $data )
-    {
-        if ( empty( $data[ 'name' ] ) ) {
-            return false;
-        }
-
-        // Create the element
-        $element_value = ( !empty( $data[ 'value' ] ) ) ? $data[ 'value' ] : null;
-        $element       = $dom->createElement( $data[ 'name' ], $element_value );
-
-        // Add any attributes
-        if ( !empty( $data[ 'attributes' ] ) && is_array( $data[ 'attributes' ] ) ) {
-            foreach ( $data[ 'attributes' ] as $attribute_key => $attribute_value ) {
-                $element->setAttribute( $attribute_key, $attribute_value );
-            }
-        }
-
-        // Any other items in the data array should be child elements
-        foreach ( $data as $data_key => $child_data ) {
-            if ( !is_numeric( $data_key ) ) {
-                continue;
-            }
-
-            $child = $this->arrayToXml( $dom, $child_data );
-            if ( $child ) {
-                $element->appendChild( $child );
-            }
-        }
-
-        return $element;
-    }
 
     public function getEntity()
     {

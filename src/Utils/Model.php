@@ -70,7 +70,11 @@ class Model
     {
         return $this->request->handleWithExceptions( function () {
 
-            return $this->request->client->delete( "{$this->entity}/{$this->{$this->primaryKey}}" );
+            return $this->request->client->delete( [
+
+                'resource' => $this->entity,
+                'id'       => $this->{$this->primaryKey},
+            ] );
         } );
     }
 
