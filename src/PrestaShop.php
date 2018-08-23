@@ -13,6 +13,7 @@ use PrestaShop\Builders\CustomerGroupBuilder;
 use PrestaShop\Builders\OrderBuilder;
 use PrestaShop\Builders\ProductBuilder;
 use PrestaShop\Builders\ProductCategoryBuilder;
+use PrestaShop\Builders\StockAvailableBuilder;
 use PrestaShop\Builders\SupplierBuilder;
 use PrestaShop\Utils\Request;
 
@@ -68,6 +69,11 @@ class PrestaShop
     public function suppliers()
     {
         return new SupplierBuilder( $this->request );
+    }
+
+    public function stock_availables()
+    {
+        return new StockAvailableBuilder( $this->request );
     }
 
 

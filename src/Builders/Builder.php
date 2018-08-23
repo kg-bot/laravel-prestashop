@@ -40,7 +40,7 @@ class Builder
      * @return mixed
      * @throws \PrestaShop\Classes\PrestaShopWebserviceException
      */
-    public function get( array $filters = [], $limit = [], bool $details = false )
+    public function get( array $filters = [], $limit = null, bool $details = false )
     {
         $optFilters = $this->prepareFilters( $filters );
         $optLimits  = $this->prepareLimit( $limit );
