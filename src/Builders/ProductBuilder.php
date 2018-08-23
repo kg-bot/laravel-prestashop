@@ -6,14 +6,16 @@
  * Time: 00.01
  */
 
-namespace Rackbeat\Builders;
+namespace PrestaShop\Builders;
 
 
-use Rackbeat\Models\Product;
+use PrestaShop\Models\Product;
 
 class ProductBuilder extends Builder
 {
 
-    protected $entity = 'products';
-    protected $model  = Product::class;
+    protected $entity        = 'products';
+    protected $detailsEntity = 'products';
+    protected $primaryKey    = 'id';
+    protected $model         = Product::class;
 }

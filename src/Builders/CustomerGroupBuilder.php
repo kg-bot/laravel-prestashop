@@ -6,13 +6,15 @@
  * Time: 15.37
  */
 
-namespace Rackbeat\Builders;
+namespace PrestaShop\Builders;
 
 
-use Rackbeat\Models\CustomerGroup;
+use PrestaShop\Models\CustomerGroup;
 
 class CustomerGroupBuilder extends Builder
 {
-    protected $entity = 'customer-groups';
-    protected $model  = CustomerGroup::class;
+    protected $entity        = 'groups';
+    protected $detailsEntity = 'groups';
+    protected $primaryKey    = 'id';
+    protected $model         = CustomerGroup::class;
 }

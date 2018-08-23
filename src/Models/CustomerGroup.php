@@ -6,11 +6,11 @@
  * Time: 11:54 PM
  */
 
-namespace Rackbeat\Models;
+namespace PrestaShop\Models;
 
 
 class CustomerGroup
 {
-    protected $entity     = '/customer-groups';
-    protected $primaryKey = 'number';
+    protected $entity     = '/groups';
+    protected $primaryKey = 'id';
 }

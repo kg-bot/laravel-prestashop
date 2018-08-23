@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: nts
- * Date: 31.3.18.
- * Time: 16.48
+ * Date: 1.4.18.
+ * Time: 00.02
  */
 
 namespace PrestaShop\Models;
@@ -11,9 +11,8 @@ namespace PrestaShop\Models;
 
 use PrestaShop\Utils\Model;
 
-class Supplier extends Model
+class ProductCategory extends Model
 {
-
-    protected $entity     = '/suppliers';
+    protected $entity     = 'categories';
     protected $primaryKey = 'id';
 }

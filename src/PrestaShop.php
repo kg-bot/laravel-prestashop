@@ -9,7 +9,11 @@
 namespace PrestaShop;
 
 use PrestaShop\Builders\CustomerBuilder;
+use PrestaShop\Builders\CustomerGroupBuilder;
 use PrestaShop\Builders\OrderBuilder;
+use PrestaShop\Builders\ProductBuilder;
+use PrestaShop\Builders\ProductCategoryBuilder;
+use PrestaShop\Builders\SupplierBuilder;
 use PrestaShop\Utils\Request;
 
 class PrestaShop
@@ -41,9 +45,29 @@ class PrestaShop
         return new CustomerBuilder( $this->request );
     }
 
+    public function customer_groups()
+    {
+        return new CustomerGroupBuilder( $this->request );
+    }
+
     public function orders()
     {
         return new OrderBuilder( $this->request );
+    }
+
+    public function products()
+    {
+        return new ProductBuilder( $this->request );
+    }
+
+    public function product_categories()
+    {
+        return new ProductCategoryBuilder( $this->request );
+    }
+
+    public function suppliers()
+    {
+        return new SupplierBuilder( $this->request );
     }
 
 
