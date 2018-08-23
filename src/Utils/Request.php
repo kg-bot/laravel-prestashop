@@ -30,8 +30,9 @@ class Request
     {
         $token     = $token ?? config( 'laravel-prestashop.token' );
         $store_url = $store_url ?? config( 'laravel-prestashop.store_url' );
+        $debug     = config( 'app.debug' );
 
-        $this->client = new PrestaShopClass( $store_url, $token, true );
+        $this->client = new PrestaShopClass( $store_url, $token, $debug );
     }
 
     /**
