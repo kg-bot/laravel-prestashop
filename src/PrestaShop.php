@@ -10,6 +10,7 @@ namespace PrestaShop;
 
 use PrestaShop\Builders\CustomerBuilder;
 use PrestaShop\Builders\CustomerGroupBuilder;
+use PrestaShop\Builders\EmployeeBuilder;
 use PrestaShop\Builders\OrderBuilder;
 use PrestaShop\Builders\ProductBuilder;
 use PrestaShop\Builders\ProductCategoryBuilder;
@@ -74,6 +75,11 @@ class PrestaShop
     public function stock_availables()
     {
         return new StockAvailableBuilder( $this->request );
+    }
+
+    public function employees()
+    {
+        return new EmployeeBuilder( $this->request );
     }
 
 
