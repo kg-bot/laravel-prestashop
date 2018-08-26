@@ -121,7 +121,7 @@ class PrestaShopClass
             ( isset( $options[ 'output_format' ] ) === true )
                 ? $options[ 'output_format' ]
                 : 'XML';
-        self::checkStatusCode( $request[ 'status_code' ] );
+        self::checkStatusCode( $request[ 'status_code' ], $request[ 'response' ] );
 
         return self::parseResponse( $request[ 'response' ], $outputFormat );
     }
@@ -223,48 +223,28 @@ class PrestaShopClass
      *
      * @param int $status_code Status code of an HTTP return
      */
-    protected function checkStatusCode( $status_code )
+    protected function checkStatusCode( $status_code, $response )
     {
+        $response = json_decode( $response );
+        $errors   = '';
+
+        if ( json_last_error() === JSON_ERROR_NONE ) {
+
+            foreach ( $response->errors as $error ) {
+
+                $errors .= $error->message . '. ';
+            }
+        }
+
         $error_label =
-            'This call to PrestaShop Web Services failed and returned an HTTP status of %d. That means: %s.';
+            'This call to PrestaShop Web Services failed and returned an HTTP status of %d. Errors: %s';
         switch ( $status_code ) {
             case 200:
             case 201:
                 break;
-            case 204:
-                throw new PrestaShopWebserviceException(
-                    sprintf( $error_label, $status_code, 'No content' )
-                );
-                break;
-            case 400:
-                throw new PrestaShopWebserviceException(
-                    sprintf( $error_label, $status_code, 'Bad Request' )
-                );
-                break;
-            case 401:
-                throw new PrestaShopWebserviceException(
-                    sprintf( $error_label, $status_code, 'Unauthorized' )
-                );
-                break;
-            case 404:
-                throw new PrestaShopWebserviceException(
-                    sprintf( $error_label, $status_code, 'Not Found' )
-                );
-                break;
-            case 405:
-                throw new PrestaShopWebserviceException(
-                    sprintf( $error_label, $status_code, 'Method Not Allowed' )
-                );
-                break;
-            case 500:
-                throw new PrestaShopWebserviceException(
-                    sprintf( $error_label, $status_code, 'Internal Server Error' )
-                );
-                break;
             default:
                 throw new PrestaShopWebserviceException(
-                    'This call to PrestaShop Web Services returned an unexpected HTTP status of:' .
-                    $status_code
+                    sprintf( $error_label, $status_code, $errors )
                 );
         }
     }
@@ -405,7 +385,7 @@ class PrestaShopClass
             ( isset( $options[ 'output_format' ] ) === true )
                 ? $options[ 'output_format' ]
                 : 'XML';
-        self::checkStatusCode( $request[ 'status_code' ] );// check the response validity
+        self::checkStatusCode( $request[ 'status_code' ], $request[ 'response' ] );// check the response validity
 
         return self::parseResponse( $request[ 'response' ], $outputFormat );
     }
@@ -443,7 +423,7 @@ class PrestaShopClass
             throw new PrestaShopWebserviceException( 'Bad parameters given' );
         }
         $request = self::executeRequest( $url, [ CURLOPT_CUSTOMREQUEST => 'HEAD', CURLOPT_NOBODY => true ] );
-        self::checkStatusCode( $request[ 'status_code' ] );// check the response validity
+        self::checkStatusCode( $request[ 'status_code' ], $request[ 'response' ] );// check the response validity
 
         return $request[ 'header' ];
     }
@@ -487,7 +467,7 @@ class PrestaShopClass
                 ? $options[ 'output_format' ]
                 : 'XML';
         $request      = self::executeRequest( $url, [ CURLOPT_CUSTOMREQUEST => 'PUT', CURLOPT_POSTFIELDS => $xml ] );
-        self::checkStatusCode( $request[ 'status_code' ] );// check the response validity
+        self::checkStatusCode( $request[ 'status_code' ], $request[ 'response' ] );// check the response validity
 
         return self::parseResponse( $request[ 'response' ], $outputFormat );
     }
@@ -535,7 +515,7 @@ class PrestaShopClass
             $url .= '&id_group_shop=' . $options[ 'id_group_shop' ];
         }
         $request = self::executeRequest( $url, [ CURLOPT_CUSTOMREQUEST => 'DELETE' ] );
-        self::checkStatusCode( $request[ 'status_code' ] );// check the response validity
+        self::checkStatusCode( $request[ 'status_code' ], $request[ 'response' ] );// check the response validity
 
         return true;
     }
