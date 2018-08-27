@@ -9,9 +9,13 @@
 namespace PrestaShop;
 
 use PrestaShop\Builders\AddressBuilder;
+use PrestaShop\Builders\CarrierBuilder;
+use PrestaShop\Builders\CartBuilder;
+use PrestaShop\Builders\CurrencyBuilder;
 use PrestaShop\Builders\CustomerBuilder;
 use PrestaShop\Builders\CustomerGroupBuilder;
 use PrestaShop\Builders\EmployeeBuilder;
+use PrestaShop\Builders\LanguageBuilder;
 use PrestaShop\Builders\OrderBuilder;
 use PrestaShop\Builders\ProductBuilder;
 use PrestaShop\Builders\ProductCategoryBuilder;
@@ -86,6 +90,26 @@ class PrestaShop
     public function addresses()
     {
         return new AddressBuilder( $this->request );
+    }
+
+    public function carts()
+    {
+        return new CartBuilder( $this->request );
+    }
+
+    public function currencies()
+    {
+        return new CurrencyBuilder( $this->request );
+    }
+
+    public function languages()
+    {
+        return new LanguageBuilder( $this->request );
+    }
+
+    public function carriers()
+    {
+        return new CarrierBuilder( $this->request );
     }
 
 
