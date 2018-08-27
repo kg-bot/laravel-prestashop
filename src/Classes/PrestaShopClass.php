@@ -230,9 +230,11 @@ class PrestaShopClass
 
         if ( json_last_error() === JSON_ERROR_NONE ) {
 
-            foreach ( $response->errors as $error ) {
+            if ( isset( $response->errors ) ) {
+                foreach ( $response->errors as $error ) {
 
-                $errors .= $error->message . '. ';
+                    $errors .= $error->message . '. ';
+                }
             }
         }
 
