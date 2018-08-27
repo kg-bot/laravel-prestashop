@@ -8,6 +8,7 @@
 
 namespace PrestaShop;
 
+use PrestaShop\Builders\AddressBuilder;
 use PrestaShop\Builders\CustomerBuilder;
 use PrestaShop\Builders\CustomerGroupBuilder;
 use PrestaShop\Builders\EmployeeBuilder;
@@ -80,6 +81,11 @@ class PrestaShop
     public function employees()
     {
         return new EmployeeBuilder( $this->request );
+    }
+
+    public function addresses()
+    {
+        return new AddressBuilder( $this->request );
     }
 
 
