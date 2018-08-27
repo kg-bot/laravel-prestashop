@@ -15,6 +15,6 @@ class OrderBuilder extends Builder
 {
     protected $entity        = 'orders';
     protected $model         = Order::class;
-    protected $detailsEntity = 'order_details';
+    protected $detailsEntity = 'orders';
     protected $primaryKey    = 'id';
 }
