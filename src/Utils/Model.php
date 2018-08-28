@@ -9,8 +9,12 @@
 namespace PrestaShop\Utils;
 
 
+use PrestaShop\Traits\Parser;
+
 class Model
 {
+    use Parser;
+
     protected $primaryKey;
     protected $entity;
     protected $modelClass = self::class;
@@ -80,17 +84,39 @@ class Model
 
     public function update( $data = [] )
     {
-        $data = array_merge( $this->toArray(), $data );
-
         return $this->request->handleWithExceptions( function () use ( $data ) {
 
-            $response = $this->request->client->put( "/{$this->entity}/{$this->{$this->primaryKey}}", [
-                'json' => $data,
+            $blank = $this->request->client->get( [
+
+                'url' => config( 'laravel-prestashop.store_url' ) . '/api/' . $this->entity,
             ] );
 
-            $responseData = json_decode( (string) $response->getBody() );
+            if ( !isset( $data[ 'name' ] ) ) {
 
-            return new $this->modelClass( $this->request, $responseData );
+                $data[ 'name' ] = $blank->getName();
+            }
+
+            $doc = new \DOMDocument();
+
+            $child = $this->arrayToXml( $doc, $data );
+
+            if ( $child ) {
+                $doc->appendChild( $child );
+            }
+            $doc->formatOutput = true; // Add whitespace to make easier to read XML
+            $xml               = $doc->saveXML();
+
+            $response = $this->request->client->edit( [
+
+                'resource' => $this->entity,
+                'putXml'   => $xml,
+                'id'       => $this->{$this->primaryKey},
+            ] );
+
+            $data = $this->xmlToArray( $response->children()->children() );
+
+
+            return new $this->modelClass( $this->request, $data );
         } );
     }
 
