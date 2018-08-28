@@ -106,14 +106,25 @@ class Model
             $doc->formatOutput = true; // Add whitespace to make easier to read XML
             $xml               = $doc->saveXML();
 
+            /**
+             * @var $response array|\SimpleXMLElement
+             */
             $response = $this->request->client->edit( [
 
-                'resource' => $this->entity,
-                'putXml'   => $xml,
-                'id'       => $this->{$this->primaryKey},
+                'resource'      => $this->entity,
+                'putXml'        => $xml,
+                'id'            => $this->{$this->primaryKey},
+                'output_format' => 'JSON',
             ] );
 
-            $data = $this->xmlToArray( $response->children()->children() );
+            if ( is_array( $response ) ) {
+
+                $data = $response[ key( $response ) ];
+
+            } else {
+
+                $data = $this->xmlToArray( $response->children()->children() );
+            }
 
 
             return new $this->modelClass( $this->request, $data );

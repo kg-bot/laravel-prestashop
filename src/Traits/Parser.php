@@ -26,7 +26,7 @@ trait Parser
         }
 
         // Create the element
-        $element_value = ( !empty( $data[ 'value' ] ) ) ? $data[ 'value' ] : null;
+        $element_value = ( isset( $data[ 'value' ] ) ) ? $data[ 'value' ] : null;
         $element       = $dom->createElement( $data[ 'name' ], $element_value );
 
         // Add any attributes
