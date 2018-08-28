@@ -40,27 +40,57 @@ class Builder
      * @return mixed
      * @throws \PrestaShop\Classes\PrestaShopWebserviceException
      */
-    public function get( array $filters = [], $limit = null, bool $details = false )
+    public function get( array $filters = [], $limit = null, bool $details = false, string $url = null )
     {
+
         $optFilters = $this->prepareFilters( $filters );
         $optLimits  = $this->prepareLimit( $limit );
 
-        return $this->request->handleWithExceptions( function () use ( $optFilters, $details, $optLimits ) {
+        return $this->request->handleWithExceptions( function () use ( $optFilters, $details, $optLimits, $filters, $url
+        ) {
 
-            $opt = [
+            if ( !is_null( $url ) ) {
 
-                'resource'      => $this->entity,
-                'output_format' => 'JSON',
-            ];
+                if ( !strpos( $url, 'output_format' ) ) {
 
-            if ( count( $optFilters ) ) {
+                    if ( !strpos( $url, '?' ) ) {
 
-                $opt = array_merge( $opt, $optFilters );
-            }
+                        $url .= '?output_format=JSON';
 
-            if ( count( $optLimits ) ) {
+                    } else {
 
-                $opt = array_merge( $opt, $optLimits );
+                        $url .= '&output_format=JSON';
+                    }
+                }
+
+                $opt = [
+
+                    'url'           => $url,
+                    'output_format' => 'JSON',
+                ];
+
+            } else {
+
+                $opt = [
+
+                    'resource'      => $this->entity,
+                    'output_format' => 'JSON',
+                ];
+
+                if ( count( $optFilters ) ) {
+
+                    $opt = array_merge( $opt, $optFilters );
+
+                    if ( in_array( 'date_add', $$filters ) ) {
+
+                        $opt[ 'date' ] = 1;
+                    }
+                }
+
+                if ( count( $optLimits ) ) {
+
+                    $opt = array_merge( $opt, $optLimits );
+                }
             }
 
             $response = $this->request->client->get( $opt );
