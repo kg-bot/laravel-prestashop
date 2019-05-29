@@ -8,6 +8,7 @@
 
 namespace PrestaShop\Builders;
 
+use DOMDocument;
 use PrestaShop\Traits\Filtering;
 use PrestaShop\Traits\Limiting;
 use PrestaShop\Traits\Parser;
@@ -81,7 +82,7 @@ class Builder
 
                     $opt = array_merge( $opt, $optFilters );
 
-                    if ( in_array( 'date_add', $$filters ) ) {
+                    if ( in_array( 'date_add', $filters ) ) {
 
                         $opt[ 'date' ] = 1;
                     }
@@ -185,7 +186,7 @@ class Builder
                 $data[ 'name' ] = $blank->getName();
             }
 
-            $doc = new \DOMDocument();
+            $doc = new DOMDocument();
 
             $child = $this->arrayToXml( $doc, $data );
 
