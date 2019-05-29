@@ -172,13 +172,15 @@ class Builder
      * @return mixed
      * @throws \PrestaShop\Classes\PrestaShopWebserviceException
      */
-    public function create( $data )
+    public function create( $data, $url = null )
     {
-        return $this->request->handleWithExceptions( function () use ( $data ) {
+        $url = ( is_null( $url ) ) ? config( 'laravel-prestashop.store_url' ) : $url;
+
+        return $this->request->handleWithExceptions( function () use ( $data, $url ) {
 
             $blank = $this->request->client->get( [
 
-                'url' => config( 'laravel-prestashop.store_url' ) . '/api/' . $this->entity,
+                'url' => $url . '/api/' . $this->entity,
             ] );
 
             if ( !isset( $data[ 'name' ] ) ) {
