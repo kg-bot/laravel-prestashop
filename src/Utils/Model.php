@@ -9,7 +9,11 @@
 namespace PrestaShop\Utils;
 
 
+use DOMDocument;
 use PrestaShop\Traits\Parser;
+use ReflectionObject;
+use ReflectionProperty;
+use SimpleXMLElement;
 
 class Model
 {
@@ -47,7 +51,7 @@ class Model
 
     protected function setAttribute( $attribute, $value )
     {
-        $this->{$attribute} = ( $value instanceof \SimpleXMLElement ) ? (string) $value : $value;
+        $this->{$attribute} = ( $value instanceof SimpleXMLElement ) ? (string) $value : $value;
     }
 
     public function __toString()
@@ -58,8 +62,8 @@ class Model
     public function toArray()
     {
         $data       = [];
-        $class      = new \ReflectionObject( $this );
-        $properties = $class->getProperties( \ReflectionProperty::IS_PUBLIC );
+        $class      = new ReflectionObject( $this );
+        $properties = $class->getProperties( ReflectionProperty::IS_PUBLIC );
 
         /** @var \ReflectionProperty $property */
         foreach ( $properties as $property ) {
@@ -82,13 +86,15 @@ class Model
         } );
     }
 
-    public function update( $data = [] )
+    public function update( $data = [], $url = null )
     {
-        return $this->request->handleWithExceptions( function () use ( $data ) {
+        $url = ( is_null( $url ) ) ? config( 'laravel-prestashop.store_url' ) : $url;
+
+        return $this->request->handleWithExceptions( function () use ( $data, $url ) {
 
             $blank = $this->request->client->get( [
 
-                'url' => config( 'laravel-prestashop.store_url' ) . '/api/' . $this->entity,
+                'url' => $url . '/api/' . $this->entity,
             ] );
 
             if ( !isset( $data[ 'name' ] ) ) {
@@ -96,7 +102,7 @@ class Model
                 $data[ 'name' ] = $blank->getName();
             }
 
-            $doc = new \DOMDocument();
+            $doc = new DOMDocument();
 
             $child = $this->arrayToXml( $doc, $data );
 
