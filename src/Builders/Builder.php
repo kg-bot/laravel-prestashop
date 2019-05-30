@@ -234,7 +234,7 @@ class Builder
     {
         return $this->request->client->get( [
 
-            'url'           => $url . '/api/' . $this->entity,
+            'url'           => $url . '/api/' . $this->entity . '?schema=blank',
             'output_format' => 'JSON',
         ] );
     }
