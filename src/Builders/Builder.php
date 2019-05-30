@@ -224,6 +224,21 @@ class Builder
         return $this->entity;
     }
 
+    /**
+     * @param $url
+     *
+     * @return \PrestaShop\Classes\SimpleXMLElement|\JsonSerializable
+     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     */
+    public function blank( $url )
+    {
+        return $this->request->client->get( [
+
+            'url'           => $url . '/api/' . $this->entity,
+            'output_format' => 'JSON',
+        ] );
+    }
+
     private function switchComparison( $comparison )
     {
         switch ( $comparison ) {
