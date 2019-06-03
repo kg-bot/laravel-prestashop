@@ -13,15 +13,15 @@ use SimpleXMLElement;
 
 trait Parser
 {
-    function arrayToXml( SimpleXMLElement $object, array $data )
+    function arrayToXml( SimpleXMLElement $object, array $data, $parent_key = null )
     {
         foreach ( $data as $key => $value ) {
-            if ( is_numeric( $key ) ) {
-                $key = str_singular( $key );
+            if ( is_numeric( $key ) && !is_null( $parent_key ) ) {
+                $key = str_singular( $parent_key );
             }
             if ( is_array( $value ) ) {
                 $new_object = $object->addChild( $key );
-                $this->arrayToXml( $new_object, $value );
+                $this->arrayToXml( $new_object, $value, $key );
             } else {
                 $object->addChild( $key, $value );
             }
