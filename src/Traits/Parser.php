@@ -16,7 +16,7 @@ trait Parser
     function arrayToXml( SimpleXMLElement $object, array $data )
     {
         foreach ( $data as $key => $value ) {
-            if ( $key === (int) $key ) {
+            if ( is_numeric( $key ) ) {
                 $key = str_singular( $key );
             }
             if ( is_array( $value ) ) {
