@@ -8,12 +8,12 @@
 
 namespace PrestaShop\Builders;
 
-use DOMDocument;
 use PrestaShop\Traits\Filtering;
 use PrestaShop\Traits\Limiting;
 use PrestaShop\Traits\Parser;
 use PrestaShop\Utils\Model;
 use PrestaShop\Utils\Request;
+use SimpleXMLElement;
 
 
 class Builder
@@ -172,31 +172,16 @@ class Builder
      * @return mixed
      * @throws \PrestaShop\Classes\PrestaShopWebserviceException
      */
-    public function create( $data, $url = null )
+    public function create( $data )
     {
-        $url = ( is_null( $url ) ) ? config( 'laravel-prestashop.store_url' ) : $url;
 
-        return $this->request->handleWithExceptions( function () use ( $data, $url ) {
+        return $this->request->handleWithExceptions( function () use ( $data ) {
 
-            $blank = $this->request->client->get( [
+            $doc = new SimpleXMLElement( '<prestashop/>' );
 
-                'url' => $url . '/api/' . $this->entity,
-            ] );
+            $this->arrayToXml( $doc, $data );
 
-            if ( !isset( $data[ 'name' ] ) ) {
-
-                $data[ 'name' ] = $blank->getName();
-            }
-
-            $doc = new DOMDocument();
-
-            $child = $this->arrayToXml( $doc, $data );
-
-            if ( $child ) {
-                $doc->appendChild( $child );
-            }
-            $doc->formatOutput = true; // Add whitespace to make easier to read XML
-            $xml               = $doc->saveXML();
+            $xml = $doc->asXML();
 
             $response = $this->request->client->add( [
 
