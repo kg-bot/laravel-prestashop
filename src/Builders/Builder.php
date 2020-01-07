@@ -8,6 +8,8 @@
 
 namespace PrestaShop\Builders;
 
+use JsonSerializable;
+use PrestaShop\Classes\PrestaShopWebserviceException;
 use PrestaShop\Traits\Filtering;
 use PrestaShop\Traits\Limiting;
 use PrestaShop\Traits\Parser;
@@ -27,7 +29,7 @@ class Builder
     protected $model;
     private   $request;
 
-    public function __construct( Request $request )
+    public function __construct(Request $request )
     {
         $this->request = $request;
     }
@@ -36,10 +38,10 @@ class Builder
      * Get list of all entries, including details if you wish
      *
      * @param array $filters
-     * @param bool  $details
+     * @param bool $details
      *
      * @return mixed
-     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     * @throws PrestaShopWebserviceException
      */
     public function get( array $filters = [], $limit = null, bool $details = false, string $url = null )
     {
@@ -82,9 +84,9 @@ class Builder
 
                     $opt = array_merge( $opt, $optFilters );
 
-                    if ( in_array( 'date_add', $filters ) ) {
+                    if (array_key_exists('date_add', $filters)) {
 
-                        $opt[ 'date' ] = 1;
+                        $opt['date'] = 1;
                     }
                 }
 
@@ -101,7 +103,7 @@ class Builder
             $items = collect( [] );
 
             if ( $fetchedItems->count() ) {
-                foreach ( $fetchedItems->first() as $index => $item ) {
+                foreach ($fetchedItems->first() as $index => $item ) {
 
                     $identifier = $item[ $this->primaryKey ] ?? null;
 
@@ -124,7 +126,7 @@ class Builder
                 if ( $details ) {
 
 
-                    foreach ( $items as $index => $item ) {
+                    foreach ($items as $index => $item ) {
 
                         $item = $this->find( $item->{$this->primaryKey} );
 
@@ -144,7 +146,7 @@ class Builder
      * @param $id
      *
      * @return mixed
-     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     * @throws PrestaShopWebserviceException
      */
     public function find( $id )
     {
@@ -170,7 +172,7 @@ class Builder
      * @param $data
      *
      * @return mixed
-     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     * @throws PrestaShopWebserviceException
      */
     public function create( $data )
     {
@@ -212,8 +214,8 @@ class Builder
     /**
      * @param $url
      *
-     * @return \PrestaShop\Classes\SimpleXMLElement|\JsonSerializable
-     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     * @return \PrestaShop\Classes\SimpleXMLElement|JsonSerializable
+     * @throws PrestaShopWebserviceException
      */
     public function blank( $url )
     {
@@ -278,11 +280,11 @@ class Builder
             '+',
             ' ',
         ];
-        foreach ( $escapedStrings as $escapedString ) {
+        foreach ($escapedStrings as $escapedString ) {
 
             $variable = str_replace( $escapedString, '$' . $escapedString, $variable );
         }
-        foreach ( $urlencodedStrings as $urlencodedString ) {
+        foreach ($urlencodedStrings as $urlencodedString ) {
 
             $variable = str_replace( $urlencodedString, urlencode( $urlencodedString ), $variable );
         }
