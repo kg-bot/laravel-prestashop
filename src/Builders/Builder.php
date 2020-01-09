@@ -25,6 +25,7 @@ class Builder
         Parser;
 
     protected $entity;
+    protected $detailsEntity;
     /** @var Model */
     protected $model;
     private   $request;
@@ -194,8 +195,8 @@ class Builder
             $data = $this->xmlToArray( $response->children()->children() );
 
 
-            return new $this->model( $this->request, $data );
-        } );
+            return new $this->model($this->request, $data);
+        });
     }
 
 
@@ -204,11 +205,31 @@ class Builder
         return $this->entity;
     }
 
-    public function setEntity( $new_entity )
+    /**
+     * @param $new_entity
+     * @return $this
+     */
+    public function setEntity($new_entity)
     {
         $this->entity = $new_entity;
 
-        return $this->entity;
+        return $this;
+    }
+
+    /**
+     * @param $entity
+     * @return $this
+     */
+    public function setDetailsEntity($entity)
+    {
+        $this->detailsEntity = $entity;
+
+        return $this;
+    }
+
+    public function getDetailEntity()
+    {
+        return $this->detailsEntity;
     }
 
     /**
@@ -217,9 +238,9 @@ class Builder
      * @return \PrestaShop\Classes\SimpleXMLElement|JsonSerializable
      * @throws PrestaShopWebserviceException
      */
-    public function blank( $url )
+    public function blank($url)
     {
-        return $this->request->client->get( [
+        return $this->request->client->get([
 
             'url'           => $url . '/api/' . $this->entity . '?schema=blank&output_format=JSON',
             'output_format' => 'JSON',
