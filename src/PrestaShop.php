@@ -34,18 +34,20 @@ class PrestaShop
     /**
      * Rackbeat constructor.
      *
-     * @param null  $token   API token
+     * @param null $token API token
+     * @param null $store_url
      * @param array $options Custom Guzzle options
      * @param array $headers Custom Guzzle headers
+     * @param null $debug
      */
-    public function __construct($token = null, $store_url = null, $options = [], $headers = [])
+    public function __construct($token = null, $store_url = null, $options = [], $headers = [], $debug = null)
     {
-        $this->initRequest($token, $store_url, $options, $headers);
+        $this->initRequest($token, $store_url, $options, $headers, $debug);
     }
 
-    private function initRequest($token, $store_url, $options = [], $headers = [])
+    private function initRequest($token, $store_url, $options = [], $headers = [], $debug = null)
     {
-        $this->request = new Request($token, $store_url, $options, $headers);
+        $this->request = new Request($token, $store_url, $options, $headers, $debug);
     }
 
     /**
