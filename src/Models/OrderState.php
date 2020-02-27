@@ -11,8 +11,8 @@ namespace PrestaShop\Models;
 
 use PrestaShop\Utils\Model;
 
-class Order extends Model
+class OrderState extends Model
 {
-    protected $entity = '/orders';
+    protected $entity = '/order_states';
     protected $primaryKey = 'id';
 }
