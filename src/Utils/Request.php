@@ -9,13 +9,15 @@
 namespace PrestaShop\Utils;
 
 
+use Exception;
+use GuzzleHttp\Client;
 use PrestaShop\Classes\PrestaShopClass;
 use PrestaShop\Classes\PrestaShopWebserviceException;
 
 class Request
 {
     /**
-     * @var \GuzzleHttp\Client
+     * @var Client
      */
     public $client;
 
@@ -26,39 +28,39 @@ class Request
      * @param array $options
      * @param array $headers
      */
-    public function __construct( $token = null, $store_url = null, $options = [], $headers = [] )
+    public function __construct($token = null, $store_url = null, $options = [], $headers = [], $debug = null)
     {
-        $token     = $token ?? config( 'laravel-prestashop.token' );
-        $store_url = $store_url ?? config( 'laravel-prestashop.store_url' );
-        $debug     = config( 'app.debug' );
+        $token = $token ?? config('laravel-prestashop.token');
+        $store_url = $store_url ?? config('laravel-prestashop.store_url');
+        $debug = $debug ?? config('app.debug');
 
-        $this->client = new PrestaShopClass( $store_url, $token, $debug );
+        $this->client = new PrestaShopClass($store_url, $token, $debug);
     }
 
     /**
      * @param $callback
      *
      * @return mixed
-     * @throws \PrestaShop\Classes\PrestaShopWebserviceException
+     * @throws PrestaShopWebserviceException
      */
     public function handleWithExceptions( $callback )
     {
         try {
             return $callback();
 
-        } catch ( PrestaShopWebserviceException $exception ) {
+        } catch (PrestaShopWebserviceException $exception) {
 
             $message = $exception->getMessage();
-            $code    = $exception->getCode();
+            $code = $exception->getCode();
 
-            throw new PrestaShopWebserviceException( $message, $code );
+            throw new PrestaShopWebserviceException($message, $code);
 
-        } catch ( \Exception $exception ) {
+        } catch (Exception $exception) {
 
             $message = $exception->getMessage();
-            $code    = $exception->getCode();
+            $code = $exception->getCode();
 
-            throw new PrestaShopWebserviceException( $message, $code );
+            throw new PrestaShopWebserviceException($message, $code);
         }
     }
 }
