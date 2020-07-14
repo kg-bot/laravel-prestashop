@@ -9,6 +9,7 @@
 namespace PrestaShop\Utils;
 
 
+use Illuminate\Support\Str;
 use PrestaShop\Traits\Parser;
 use ReflectionObject;
 use ReflectionProperty;
@@ -16,118 +17,110 @@ use SimpleXMLElement;
 
 class Model
 {
-    use Parser;
+	use Parser;
 
-    protected $primaryKey;
-    protected $entity;
-    protected $modelClass = self::class;
-    protected $fillable   = [];
+	protected $primaryKey;
+	protected $entity;
+	protected $modelClass = self::class;
+	protected $fillable   = [];
 
-    /**
-     * @var Request
-     */
-    protected $request;
+	/**
+	 * @var Request
+	 */
+	protected $request;
 
-    public function __construct( Request $request, $data = [] )
-    {
-        $this->request = $request;
-        $data          = (array) $data;
+	public function __construct( Request $request, $data = [] ) {
+		$this->request = $request;
+		$data          = (array) $data;
 
-        foreach ( $data as $key => $value ) {
+		foreach ( $data as $key => $value ) {
 
-            $customSetterMethod = 'set' . ucfirst( camel_case( $key ) ) . 'Attribute';
+			$customSetterMethod = 'set' . ucfirst( Str::camel( $key ) ) . 'Attribute';
 
-            if ( !method_exists( $this, $customSetterMethod ) ) {
+			if ( !method_exists( $this, $customSetterMethod ) ) {
 
-                $this->setAttribute( $key, $value );
+				$this->setAttribute( $key, $value );
 
-            } else {
+			} else {
 
-                $this->setAttribute( $key, $this->{$customSetterMethod}( $value ) );
-            }
-        }
-    }
+				$this->setAttribute( $key, $this->{$customSetterMethod}( $value ) );
+			}
+		}
+	}
 
-    protected function setAttribute( $attribute, $value )
-    {
-        $this->{$attribute} = ( $value instanceof SimpleXMLElement ) ? (string) $value : $value;
-    }
+	protected function setAttribute( $attribute, $value ) {
+		$this->{$attribute} = ( $value instanceof SimpleXMLElement ) ? (string) $value : $value;
+	}
 
-    public function __toString()
-    {
-        return json_encode( $this->toArray() );
-    }
+	public function __toString() {
+		return json_encode( $this->toArray() );
+	}
 
-    public function toArray()
-    {
-        $data       = [];
-        $class      = new ReflectionObject( $this );
-        $properties = $class->getProperties( ReflectionProperty::IS_PUBLIC );
+	public function toArray() {
+		$data       = [];
+		$class      = new ReflectionObject( $this );
+		$properties = $class->getProperties( ReflectionProperty::IS_PUBLIC );
 
-        /** @var \ReflectionProperty $property */
-        foreach ( $properties as $property ) {
+		/** @var ReflectionProperty $property */
+		foreach ( $properties as $property ) {
 
-            $data[ $property->getName() ] = $this->{$property->getName()};
-        }
+			$data[ $property->getName() ] = $this->{$property->getName()};
+		}
 
-        return $data;
-    }
+		return $data;
+	}
 
-    public function delete()
-    {
-        return $this->request->handleWithExceptions( function () {
+	public function delete() {
+		return $this->request->handleWithExceptions( function () {
 
-            return $this->request->client->delete( [
+			return $this->request->client->delete( [
 
-                'resource' => $this->entity,
-                'id'       => $this->{$this->primaryKey},
-            ] );
-        } );
-    }
+				'resource' => $this->entity,
+				'id'       => $this->{$this->primaryKey},
+			] );
+		} );
+	}
 
-    public function update( $data = [] )
-    {
+	public function update( $data = [] ) {
 
-        return $this->request->handleWithExceptions( function () use ( $data ) {
+		return $this->request->handleWithExceptions( function () use ( $data ) {
 
-            $doc = new SimpleXMLElement( '<prestashop/>' );
+			$doc = new SimpleXMLElement( '<prestashop/>' );
 
-            $this->arrayToXml( $doc, $data );
+			$this->arrayToXml( $doc, $data );
 
-            $xml = $doc->asXML();
+			$xml = $doc->asXML();
 
-            /**
-             * @var $response array|\SimpleXMLElement
-             */
-            $response = $this->request->client->edit( [
+			/**
+			 * @var $response array|SimpleXMLElement
+			 */
+			$response = $this->request->client->edit( [
 
-                'resource'      => $this->entity,
-                'putXml'        => $xml,
-                'id'            => $this->{$this->primaryKey},
-                'output_format' => 'JSON',
-            ] );
+				'resource'      => $this->entity,
+				'putXml'        => $xml,
+				'id'            => $this->{$this->primaryKey},
+				'output_format' => 'JSON',
+			] );
 
-            if ( is_array( $response ) ) {
+			if ( is_array( $response ) ) {
 
-                $data = $response[ key( $response ) ];
+				$data = $response[ key( $response ) ];
 
-            } else {
+			} else {
 
-                $data = $this->xmlToArray( $response->children()->children() );
-            }
+				$data = $this->xmlToArray( $response->children()->children() );
+			}
 
 
-            return new $this->modelClass( $this->request, $data );
-        } );
-    }
+			return new $this->modelClass( $this->request, $data );
+		} );
+	}
 
-    public function getEntity()
-    {
-        return $this->entity;
-    }
+	public function getEntity() {
+		return $this->entity;
+	}
 
-    public function setEntity( $new_entity )
-    {
-        $this->entity = $new_entity;
-    }
+	public function setEntity( $new_entity ) {
+		$this->entity = $new_entity;
+	}
 }
