@@ -143,8 +143,8 @@ class PrestaShopClass
             CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
             CURLOPT_USERPWD        => $this->key . ':',
             CURLOPT_HTTPHEADER     => [ 'Expect:' ],
-            CURLOPT_TIMEOUT: 20,
-            CURLOPT_CONNECTTIMEOUT: 10,
+            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_CONNECTTIMEOUT => 10,
         ];
 
         $session = curl_init( $url );
